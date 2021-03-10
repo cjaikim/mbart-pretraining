@@ -10,6 +10,7 @@ def get_args():
     arg_parser.add_argument('--data_path',required=True)
     arg_parser.add_argument('--output_path',required=True)
     arg_parser.add_argument('--model_file',required=True)
+    arg_parser.add_argument('--batch_size',required=False,default=5)
 
     args = arg_parser.parse_args()
     return args
@@ -33,20 +34,14 @@ def train_MBart(data_path,tokenizer,output_path):
     src_lang,tgt_lang = (sentences[lang_id] for lang_id in sentences)
     batch = tokenizer.prepare_seq2seq_batch(src_texts=src_lang,tgt_texts=tgt_lang,return_tensors='pt')
     
-    #find max sequence len
-    max_seq_len = 0
-    for seq in batch['input_ids']:
-        if len(seq) > max_seq_len:
-            max_seq_len = len(seq)
-    print(max_seq_len)
     
-    model(input_ids=batch['input_ids'][:5],decoder_input_ids=batch['labels'][:5])
+    model(input_ids=batch['input_ids'],decoder_input_ids=batch['labels'])
     model.save_pretrained(output_path)
             
 if __name__=='__main__':
     args = get_args()
     
-    tokenizer = MBartTokenizer(vocab_file=args.model_file) #create new MBTokenizer from file created by google/sentencepiece
+    tokenizer = MBartTokenizer.from_pretrained(args.model_file) #create new MBTokenizer from file created by google/sentencepiece
     
     train_MBart(args.data_path,tokenizer,args.output_path)
 

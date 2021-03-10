@@ -68,6 +68,7 @@ def write_sampled_set(sentences,lang_counts,alpha,output_dir,test_split_ratio):
                     train.write(s)
                 else:
                     test.write(s)
+                i += 1
 
         train.close()
         test.close()
